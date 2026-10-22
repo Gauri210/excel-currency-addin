@@ -7,7 +7,7 @@ An Office task pane add-in for Excel. The user enters an amount and picks two cu
 
 **Tech:** HTML, CSS and JavaScript task pane, Office.js, Frankfurter API (no API key), Node.js, webpack, Yeoman Office generator.
 
-![Side panel](docs/screenshots/taskpane.png)
+![Side panel](Currency%20Converter/docs/screenshots/taskpane.png)
 
 ## How to use it
 
@@ -26,8 +26,8 @@ Notes:
 - Rates come from the European Central Bank and are only published on working days. For a weekend or holiday the add-in uses the previous working day, and the *Rate date* column shows which day that was.
 - Rates are available from 4 January 1999.
 
-![Conversions sheet](docs/screenshots/conversions-sheet.png)
-![Rate history chart](docs/screenshots/rate-history.png)
+![Conversions sheet](Currency%20Converter/docs/screenshots/conversions-sheet.png)
+![Rate history chart](Currency%20Converter/docs/screenshots/rate-history.png)
 
 ## How it works
 
@@ -43,6 +43,8 @@ flowchart LR
     P -->|"Loading… / result / error"| U
 ```
 
+All project files are inside the `Currency Converter` folder.
+
 | File | Owner | What it does |
 | --- | --- | --- |
 | `manifest.xml` | Member 1 | Add-in name, ribbon button, where the panel is loaded from |
@@ -54,6 +56,7 @@ flowchart LR
 ## Running the tests
 
 ```bash
+cd "Currency Converter"
 npm test
 ```
 
@@ -87,6 +90,7 @@ The tests use Node's built-in test runner (Node 20 or newer) and a fake `fetch`,
 **Desktop Excel**
 
 ```bash
+cd "Currency Converter"
 npm install
 npm start
 ```
@@ -109,20 +113,35 @@ This builds the add-in, starts the dev server on `https://localhost:3000`, and s
 
 #### What are Office Add-ins and the manifest file?
 
-_Write your answer here in your own words. Cover: what an Office Add-in is (a web app running inside an Office app, using Office.js); what the manifest is; its key parts (`Id`, `DisplayName`, `Hosts`, `SourceLocation`, `Permissions`, `VersionOverrides` for the ribbon button); and why we chose the add-in only XML manifest._
+An Office Add-in is a small web app (HTML, CSS and JavaScript) that runs inside an Office program such as Excel. It appears as a side panel (task pane) and talks to the open workbook through Microsoft's JavaScript library, Office.js. Because it is just a web page, the same add-in works in Excel on Windows, Mac and the web.
+
+The manifest (`manifest.xml`) tells Excel what the add-in is and where to find it. Its key parts are:
+
+- `Id`: a unique ID (GUID) for the add-in.
+- `DisplayName` and `Description`: the name and text the user sees.
+- `Hosts`: which Office apps it runs in; for us, `Workbook` (Excel).
+- `SourceLocation`: the web address of the task pane page (`https://localhost:3000/taskpane.html` while developing).
+- `Permissions`: what the add-in may do with the document; we use `ReadWriteDocument` because we write to the sheet.
+- `VersionOverrides`: adds the **Convert Currency** button in the **Currency** group on the Home tab.
+
+We chose the add-in only XML manifest because it is what the Yeoman generator produces for Excel, it is supported by every version of Excel including Excel on the web, and it can be uploaded directly for testing without any extra setup.
 
 #### How do you sideload an add-in for testing?
 
-_Write your answer here in your own words. Cover: what sideloading means; how `npm start` does it on desktop; how to upload the manifest on Excel on the web; and why HTTPS and a certificate are needed._
+Sideloading means installing an add-in yourself for testing, without publishing it to the Microsoft store. Excel reads our manifest and loads the task pane from our own computer.
+
+On desktop Excel, `npm start` does everything: it builds the code, starts the dev server on `https://localhost:3000`, registers the manifest with Excel and opens Excel with the add-in loaded. On Excel on the web, we keep the dev server running and upload `manifest.xml` through **Home → Add-ins → More Add-ins → My Add-ins → Upload My Add-in** (or **Manage your apps → Upload an app**).
+
+Office only loads add-in pages over HTTPS, so the dev server needs a security certificate. `office-addin-dev-certs` creates a local certificate and marks it as trusted on the computer, so Excel and the browser accept `https://localhost`.
 
 ### Pull requests
 
-- `feat/setup-manifest` to `main`: (add link)
-- `docs/readme-setup` to `main`: (add link)
+- `feat/setup-manifest` to `main`: [#1](https://github.com/Gauri210/excel-currency-addin/pull/1)
+- `docs/readme-setup` to `main`: [#2](https://github.com/Gauri210/excel-currency-addin/pull/2)
 
 ---
 
-## Member 2: Exchange Rate and Conversion (Name)
+## Member 2: Exchange Rate and Conversion (Edlyn Mathias)
 
 **Branch:** `feat/rate-conversion`
 **Files:** `src/currency/converter.js`, `test/converter.test.mjs`, `package.json` (`test` script)
@@ -140,19 +159,31 @@ _Write your answer here in your own words. Cover: what sideloading means; how `n
 
 #### How does the Frankfurter API work?
 
-_Write your answer here in your own words._
+Frankfurter is a free, open-source web API that returns currency exchange rates published by the European Central Bank. It needs no API key and answers in JSON.
+
+We use three requests:
+
+- `/v1/latest?base=USD&symbols=INR` for the latest rate,
+- `/v1/2024-03-15?base=USD&symbols=INR` for the rate on a past date,
+- `/v1/2024-02-14..2024-03-15?base=USD&symbols=INR` for every rate between two dates (used for the chart),
+
+plus `/v1/currencies` for the list of currency codes and names in the dropdowns.
+
+A typical answer is `{"amount":1,"base":"USD","date":"2026-10-21","rates":{"INR":94.47}}`. The ECB only publishes rates on working days, so for a weekend or holiday the API returns the last working day's rate, and the `date` field tells us which day that was. Data starts on 4 January 1999.
 
 #### Why test with a fake fetch instead of the real API?
 
-_Write your answer here in your own words._
+The real API gives a different rate every day, so a test like "100 USD should be 8,412 INR" would fail tomorrow. The tests would also need the internet and would break if the API was slow or down.
+
+Instead, each test passes a fake `fetch` function that returns a fixed answer we choose. This lets us check exactly what we care about: that we build the right URL, that amount × rate is calculated and rounded correctly, and that errors (unknown currency, server error, no internet) give the right message. The tests are fast, always give the same result, and can test error cases that are hard to cause with the real API.
 
 ### Pull requests
 
-- `feat/rate-conversion` to `main`: (add link)
+- `feat/rate-conversion` to `main`: [#7](https://github.com/Gauri210/excel-currency-addin/pull/7)
 
 ---
 
-## Member 3: Writing to Excel (Name)
+## Member 3: Writing to Excel (Aabha Karle)
 
 **Branch:** `feat/excel-output`
 **Files:** `src/excel/writer.js`
@@ -168,22 +199,28 @@ _Write your answer here in your own words._
 
 #### How does `Excel.run` and `context.sync()` work?
 
-_Write your answer here in your own words._
+`Excel.run` gives us a `context`, which is our connection to the open workbook. Inside it we work with proxy objects (sheets, ranges, tables, charts) that stand for things in Excel. Setting a value or calling a method on them does not change Excel straight away; the commands are queued.
+
+`context.sync()` sends all the queued commands to Excel in one batch and waits for them to finish. It also fills in any properties we asked for with `load()`, for example a range's `address`. Batching like this matters because Excel can be on another machine (Excel on the web), so one round trip for many changes is much faster than one per change.
+
+In `writer.js` we sync once to check whether the Conversions sheet and table already exist (`getItemOrNullObject` plus `isNullObject`), then queue all the writes and formatting, and sync again at the end.
 
 #### Why write the result as a formula?
 
-_Write your answer here in your own words._
+If we wrote the result as a plain number, nobody could see how it was worked out. Writing `=ROUND(A2*D2,2)` makes the calculation visible: clicking the Result cell shows that it is Amount (column A) × Rate (column D), rounded to 2 decimals, so anyone can check it.
+
+It also keeps the sheet consistent: if someone edits the amount or the rate, Excel recalculates the result automatically. And it means the result in Excel is calculated by Excel itself, independently of our JavaScript, which is a good cross-check that the conversion is right.
 
 ### Pull requests
 
-- `feat/excel-output` to `main`: (add link)
+- `feat/excel-output` to `main`: [#8](https://github.com/Gauri210/excel-currency-addin/pull/8)
 
 ---
 
-## Member 4: Side Panel, Testing and Report (Name)
+## Member 4: Side Panel, Testing and Report (Rudra Maharao)
 
-**Branches:** `feat/taskpane-ui`, `docs/readme-report`
-**Files:** `src/taskpane/taskpane.html`, `src/taskpane/taskpane.css`, `src/taskpane/taskpane.js`, `README.md`, `docs/screenshots/`
+**Branch:** `feat/taskpane-ui`
+**Files:** `src/taskpane/taskpane.html`, `src/taskpane/taskpane.css`, `src/taskpane/taskpane.js`, `README.md` (repo root), `docs/screenshots/`, `.gitignore`
 
 ### What I did
 
@@ -197,26 +234,31 @@ _Write your answer here in your own words._
 
 | # | Test | Expected | Result |
 | --- | --- | --- | --- |
-| 1 | 100 USD to INR, no date | Row added, Result formula = Amount × Rate | |
-| 2 | 100 EUR to GBP on a past weekday | Rate date = that day | |
-| 3 | Same, on a Sunday | Rate date = the Friday before | |
-| 4 | Empty amount | "Please enter an amount." | |
-| 5 | Amount -5 | "The amount cannot be negative." | |
-| 6 | Amount "abc" | "The amount must be a number." | |
-| 7 | USD to USD | "Choose two different currencies." | |
-| 8 | Wi-Fi off, click Convert | "Could not reach the exchange-rate service…" | |
-| 9 | Second and third conversion | New rows added below, formulas point at their own row | |
-| 10 | Chart box ticked | Rate History sheet with a line chart | |
-| 11 | Editing a cell, then Convert | "Excel is busy editing a cell…" | |
-| 12 | `npm test` | All tests pass | |
+| 1 | 100 USD to INR, no date | Row added, Result formula = Amount × Rate | Pass |
+| 2 | 100 EUR to GBP on a past weekday | Rate date = that day | Pass |
+| 3 | Same, on a Sunday | Rate date = the Friday before | Pass |
+| 4 | Empty amount | "Please enter an amount." | Pass |
+| 5 | Amount -5 | "The amount cannot be negative." | Pass |
+| 6 | Amount "abc" | "The amount must be a number." | Pass |
+| 7 | USD to USD | "Choose two different currencies." | Pass |
+| 8 | Wi-Fi off, click Convert | "Could not reach the exchange-rate service…" | Pass |
+| 9 | Second and third conversion | New rows added below, formulas point at their own row | Pass |
+| 10 | Chart box ticked | Rate History sheet with a line chart | Pass |
+| 11 | Editing a cell, then Convert | "Excel is busy editing a cell…" | Pass |
+| 12 | `npm test` | All tests pass | Pass (33/33) |
 
 ### Research answers
 
 #### How does the task pane talk to Excel and to the web?
 
-_Write your answer here in your own words._
+The task pane is a web page running inside Excel, so it talks in two directions.
+
+**To the web:** it uses the browser's `fetch` function to call the Frankfurter API over HTTPS and gets back JSON with the rate (`converter.js`).
+
+**To Excel:** it uses Office.js. `Office.onReady` tells us when Excel has loaded the panel, and `Excel.run` with `context.sync()` lets us read and write the workbook: creating the sheets, adding table rows, writing the formula and drawing the chart (`writer.js`).
+
+`taskpane.js` connects the two. When Convert is clicked it checks the input, fetches the rate, writes the row to Excel, adds the rate history chart, and shows "Loading…", an error, or the result in the panel.
 
 ### Pull requests
 
-- `feat/taskpane-ui` to `main`: (add link)
-- `docs/readme-report` to `main`: (add link)
+- `feat/taskpane-ui` to `main`: [#9](https://github.com/Gauri210/excel-currency-addin/pull/9)
