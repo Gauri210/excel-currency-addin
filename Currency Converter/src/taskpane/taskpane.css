@@ -1,214 +1,80 @@
-/* Person 4: side panel styles */
+/* 
+ * Copyright (c) Microsoft Corporation. All rights reserved. Licensed under the MIT license.
+ * See LICENSE in the project root for license information.
+ */
 
-:root {
-  --accent: #217346; /* Excel green */
-  --accent-hover: #185c37;
-  --text: #201f1e;
-  --muted: #605e5c;
-  --border: #c8c6c4;
-  --bg: #ffffff;
-  --bg-soft: #f3f2f1;
-  --error-bg: #fde7e9;
-  --error-text: #a4262c;
-  --ok-bg: #dff6dd;
-  --ok-text: #107c10;
+ html,
+ body {
+     width: 100%;
+     height: 100%;
+     margin: 0;
+     padding: 0;
+ }
+ 
+ ul {
+     margin: 0;
+     padding: 0;
+ }
+ 
+ .ms-welcome__header {
+    padding: 20px;
+    padding-bottom: 30px;
+    padding-top: 100px;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    align-items: center;
+ }
+
+ .ms-welcome__main {
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-direction: column;
+    flex-direction: column;
+    -webkit-flex-wrap: nowrap;
+    flex-wrap: nowrap;
+    -webkit-align-items: center;
+    align-items: center;
+    -webkit-flex: 1 0 0;
+    flex: 1 0 0;
+    padding: 10px 20px;
+ }
+ 
+ .ms-welcome__main > h2 {
+     width: 100%;
+     text-align: center;
+ }
+ 
+ .ms-welcome__features {
+     list-style-type: none;
+     margin-top: 20px;
+ }
+ 
+ .ms-welcome__features.ms-List .ms-ListItem {
+     padding-bottom: 20px;
+     display: -webkit-flex;
+     display: flex;
+ }
+ 
+ .ms-welcome__features.ms-List .ms-ListItem > .ms-Icon {
+     margin-right: 10px;
+ }
+ 
+ .ms-welcome__action.ms-Button--hero {
+     margin-top: 30px;
+ }
+ 
+.ms-Button.ms-Button--hero .ms-Button-label {
+  color: #0078d7;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-html,
-body {
-  margin: 0;
-  padding: 0;
-  background: var(--bg);
-  color: var(--text);
-  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", sans-serif;
-  font-size: 14px;
-}
-
-[hidden] {
-  display: none !important;
-}
-
-.pane-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 16px;
-  border-bottom: 1px solid var(--bg-soft);
-}
-
-.pane-header h1 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.subtitle {
-  margin: 2px 0 0;
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.notice {
-  margin: 16px;
-  padding: 12px;
-  background: var(--bg-soft);
-  border-radius: 4px;
-}
-
-main {
-  padding: 16px;
-}
-
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-  min-width: 0;
-}
-
-label {
-  font-weight: 600;
-  font-size: 13px;
-}
-
-.control {
-  width: 100%;
-  height: 34px;
-  padding: 0 8px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  font: inherit;
-  color: inherit;
-  background: var(--bg);
-}
-
-input:focus,
-select:focus,
-button:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 1px;
-}
-
-.control.invalid {
-  border-color: var(--error-text);
-}
-
-.hint {
-  font-size: 12px;
-  color: var(--muted);
-}
-
-.currency-row {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.currency-row .icon-button {
-  align-self: center;
-  transform: rotate(90deg);
-}
-
-.icon-button {
-  height: 34px;
-  width: 34px;
-  flex: none;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background: var(--bg);
-  font-size: 16px;
+.ms-Button.ms-Button--hero:hover .ms-Button-label,
+.ms-Button.ms-Button--hero:focus .ms-Button-label{
+  color: #005a9e;
   cursor: pointer;
 }
 
-.icon-button:hover {
-  background: var(--bg-soft);
-}
-
-.checkbox {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 400;
-}
-
-button.primary {
-  height: 36px;
-  border: none;
-  border-radius: 4px;
-  background: var(--accent);
-  color: #fff;
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-button.primary:hover {
-  background: var(--accent-hover);
-}
-
-button:disabled {
-  opacity: 0.6;
-  cursor: wait;
-}
-
-.status {
-  margin-top: 16px;
-  padding: 10px 12px;
-  border-radius: 4px;
-  background: var(--bg-soft);
-}
-
-.status.error {
-  background: var(--error-bg);
-  color: var(--error-text);
-}
-
-.status.loading::before {
-  content: "";
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  margin-right: 8px;
-  vertical-align: -1px;
-  border: 2px solid var(--border);
-  border-top-color: var(--accent);
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.result {
-  margin-top: 16px;
-  padding: 12px;
-  background: var(--ok-bg);
-  border-radius: 4px;
-}
-
-.result-main {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--ok-text);
-}
-
-.result-detail {
-  margin: 4px 0 0;
-  font-size: 12px;
-  color: var(--muted);
+b {
+    font-weight: bold;
 }
