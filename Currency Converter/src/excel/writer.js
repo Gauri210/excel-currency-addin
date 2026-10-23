@@ -1,14 +1,4 @@
-/*
- * Person 3: put the result into Excel.
- *
- * - writeConversion(): adds one row to the "Conversions" table with the amount,
- *   the currencies, the rate, the date of the rate and the result. The result
- *   is an Excel formula (e.g. =ROUND(A2*D2,2)), so anyone can check it.
- * - writeRateHistory(): fills the "Rate History" sheet with daily rates and
- *   draws a line chart of how the rate changed.
- */
 
-/* global Excel */
 
 export const CONVERSIONS_SHEET = "Conversions";
 export const CONVERSIONS_TABLE = "ConversionTable";
